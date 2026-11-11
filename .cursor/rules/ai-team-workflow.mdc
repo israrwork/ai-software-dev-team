@@ -1,0 +1,50 @@
+---
+description: Runs the AI software team from requirements through an approved release
+alwaysApply: true
+---
+
+# AI team workflow
+
+The parent session runs this sequence by delegating to `.cursor/agents/`. Specialists write notes under `docs/` and change only the files their task assigns. Use the feature slug from the requirements brief in every filename.
+
+## Sequence
+
+1. Delegate to **project-manager** to collect requirements, ask the user what is unclear, and write `docs/requirements/<slug>-brief.md` plus `docs/requirements/<slug>-status.md`.
+2. After the brief exists, delegate to **researcher** and **feasibility-analyst** in parallel. They write separate files in `docs/research/`.
+3. Delegate to **project-manager** to consolidate both findings and ask the user to review them.
+4. After the user reviews requirements and research, delegate to **software-architect** to write `docs/architecture/<slug>-design.md`.
+5. After the user approves that design, delegate to **project-manager** to write `docs/requirements/<slug>-tasks.md` with one owner per file area.
+6. Delegate only the assigned implementation tasks. Run them in parallel when the design says their files do not overlap:
+   - **frontend-developer**
+   - **backend-developer**
+   - **database-engineer**
+   - **integration-specialist**
+7. Delegate to **qa-engineer** to validate and write `docs/testing/<slug>-qa.md`.
+8. Delegate to **security-auditor** for an independent review at `docs/testing/<slug>-security.md`.
+9. Delegate each fix only to the developer who owns that file.
+10. Delegate revalidation to **qa-engineer** and **security-auditor**.
+11. After revalidation passes, delegate to **devops-engineer** to prepare `docs/deployment/<slug>-release.md`. Stop before any deploy.
+12. Delegate to **project-manager** to write `docs/requirements/<slug>-delivery-report.md`.
+
+Skip a role only when the approved design says the work does not need it, and say which role was skipped.
+
+## Gates
+
+- Architecture starts only after the user reviews the requirements brief and both research files.
+- Implementation starts only after the user approves the architecture.
+- Deployment and production commands run only after the user explicitly approves them.
+- Destructive database operations run only after the user explicitly approves the exact command.
+- Credentials, API keys, and secrets stay out of docs, commits, and reports. Name the environment variable instead.
+
+## Handoff
+
+Give the next agent the goal, feature slug, docs to read, files it may change, and open questions. Each agent reads those docs before acting, follows the repository's existing conventions, and ends with assumptions, risks, blockers, and incomplete work.
+
+```markdown
+Goal: Design password reset
+Slug: password-reset
+Read: docs/requirements/password-reset-brief.md, docs/research/password-reset-research.md, docs/research/password-reset-feasibility.md
+May change: docs/architecture/password-reset-design.md
+Open: User reviewed research. Architecture is not approved yet.
+Next: software-architect
+```
