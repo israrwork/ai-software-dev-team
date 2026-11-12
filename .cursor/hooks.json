@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "node .cursor/hooks/guard-shell.js",
+        "timeout": 15,
+        "failClosed": false
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "node .cursor/hooks/scan-edit.js",
+        "timeout": 15,
+        "failClosed": false
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "node .cursor/hooks/after-edit.js",
+        "matcher": "Write|StrReplace|EditNotebook",
+        "timeout": 15,
+        "failClosed": false
+      }
+    ],
+    "subagentStop": [
+      {
+        "command": "node .cursor/hooks/log-subagent.js",
+        "timeout": 15,
+        "failClosed": false
+      }
+    ]
+  }
+}

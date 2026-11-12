@@ -1,0 +1,4 @@
+.cursor/hooks/logs/
+.env
+.env.local
+.env.*.local

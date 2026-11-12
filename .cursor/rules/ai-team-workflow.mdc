@@ -1,50 +1,57 @@
 ---
-description: Runs the AI software team from requirements through an approved release
+description: Operating principles, gates, and safety rules for the AI software team
 alwaysApply: true
 ---
 
-# AI team workflow
+# AI team operating principles
 
-The parent session runs this sequence by delegating to `.cursor/agents/`. Specialists write notes under `docs/` and change only the files their task assigns. Use the feature slug from the requirements brief in every filename.
+The parent session coordinates `.cursor/agents/`. Specialists return work to the parent. They do not spawn other agents. Follow `docs/ai-team/WORKFLOW.md`.
 
-## Sequence
+## Repository
 
-1. Delegate to **project-manager** to collect requirements, ask the user what is unclear, and write `docs/requirements/<slug>-brief.md` plus `docs/requirements/<slug>-status.md`.
-2. After the brief exists, delegate to **researcher** and **feasibility-analyst** in parallel. They write separate files in `docs/research/`.
-3. Delegate to **project-manager** to consolidate both findings and ask the user to review them.
-4. After the user reviews requirements and research, delegate to **software-architect** to write `docs/architecture/<slug>-design.md`.
-5. After the user approves that design, delegate to **project-manager** to write `docs/requirements/<slug>-tasks.md` with one owner per file area.
-6. Delegate only the assigned implementation tasks. Run them in parallel when the design says their files do not overlap:
-   - **frontend-developer**
-   - **backend-developer**
-   - **database-engineer**
-   - **integration-specialist**
-7. Delegate to **qa-engineer** to validate and write `docs/testing/<slug>-qa.md`.
-8. Delegate to **security-auditor** for an independent review at `docs/testing/<slug>-security.md`.
-9. Delegate each fix only to the developer who owns that file.
-10. Delegate revalidation to **qa-engineer** and **security-auditor**.
-11. After revalidation passes, delegate to **devops-engineer** to prepare `docs/deployment/<slug>-release.md`. Stop before any deploy.
-12. Delegate to **project-manager** to write `docs/requirements/<slug>-delivery-report.md`.
+This checkout is the AI team. Each application lives in its own `PROJECT_ROOT`, outside this repository, with its own Git history. Paths are in `docs/ai-team/PROJECT_LAYOUT.md`. Ordinary application work must not change agents, skills, rules, templates, or these team docs. Ask the user before changing them.
 
-Skip a role only when the approved design says the work does not need it, and say which role was skipped.
+## General
+
+- Read the existing code and docs before changing them.
+- Keep the repository's technology choices. Leave working code in place when it already meets the task.
+- Apply SOLID and small modules where they fit the current design.
+- Add a dependency only when the approved design requires it.
+- Do not invent requirements. Record assumptions in the deliverable.
+- Prefer the smallest maintainable change.
+- Update docs that the change makes stale.
+
+## Collaboration
+
+- Give every task one owner, one status, and explicit inputs and outputs.
+- Use the handoff in `docs/ai-team/AGENT_HANDOFF_PROTOCOL.md`.
+- Run tasks in parallel only when their files and dependencies are independent.
+- Local subagents share this checkout. Run overlapping or dependent edits one at a time. Ask the user before using a cloud subagent or any other isolated worktree.
+- The parent reviews deliverables and updates `PROJECT_ROOT/docs/development/TASK_BOARD.md`. A specialist reply is not completion.
+
+## Done
+
+Mark a task DONE only when `docs/ai-team/DEFINITION_OF_DONE.md` is satisfied: the deliverable exists, required checks were run, acceptance criteria hold, required docs are updated, and limitations are recorded.
+
+## Safety
+
+- Never write production secret values. Name the environment variable. A local demo account may be documented only when its password is development-only.
+- Never delete production data. Wait for the user to approve the exact destructive command.
+- Never present the application for review unless it has started and the local URL was checked.
+- Never treat passing tests as approval of the UI.
+- Never treat silence as approval.
+- Never deploy or run a production command until the user has approved the running local application and then explicitly approved that production action.
+- Read an existing file before writing it. Preserve content the task does not assign you to change.
+- Never claim tests passed without a command and its result.
+- Never initialize an application Git repository inside the AI team repository.
+- Never push, publish, or create a GitHub repository until the user explicitly approves that action.
 
 ## Gates
 
-- Architecture starts only after the user reviews the requirements brief and both research files.
-- Implementation starts only after the user approves the architecture.
-- Deployment and production commands run only after the user explicitly approves them.
-- Destructive database operations run only after the user explicitly approves the exact command.
-- Credentials, API keys, and secrets stay out of docs, commits, and reports. Name the environment variable instead.
+- Gate 1: the user approves requirements before research is used for design.
+- Show the consolidated research to the user before architecture starts.
+- Gate 2: the user approves the architecture before implementation tasks start.
+- Gate 3: run the application locally after QA and stop. The user must explicitly approve that running application.
+- Gate 4: production preparation starts only after Gate 3 is open. Deploy only after the user explicitly approves the production action.
 
-## Handoff
-
-Give the next agent the goal, feature slug, docs to read, files it may change, and open questions. Each agent reads those docs before acting, follows the repository's existing conventions, and ends with assumptions, risks, blockers, and incomplete work.
-
-```markdown
-Goal: Design password reset
-Slug: password-reset
-Read: docs/requirements/password-reset-brief.md, docs/research/password-reset-research.md, docs/research/password-reset-feasibility.md
-May change: docs/architecture/password-reset-design.md
-Open: User reviewed research. Architecture is not approved yet.
-Next: software-architect
-```
+Details: `docs/ai-team/APPROVAL_POLICY.md`.
